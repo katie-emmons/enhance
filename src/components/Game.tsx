@@ -3,14 +3,37 @@ import PixelatedImage from "./PixelatedImage";
 import { puzzles } from "../data/puzzles";
 
 function Game() {
-  // set initial level to 1 (hardest)
+  // constants
   const [level, setLevel] = useState(1);
   const [guess, setGuess] = useState("");
   const [message, setMessage] = useState("");
-
+  const [screen, setScreen] = useState("home");
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
-
   const puzzle = puzzles[currentPuzzle];
+
+  if (screen === "home"){
+    // return home screen
+    return (
+      <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "Arial, sans-serif",
+        gap: "20px",
+      }}
+    >
+      <h2>Identify the image</h2>
+
+      <button onClick={() => setScreen("playing")}>
+        Start
+      </button>
+      </div>
+
+    )
+  }
 
 
   return (
@@ -47,29 +70,11 @@ function Game() {
 
       if (normalizedGuess === puzzle.answer) {
         setMessage("🎉 Correct!");
-        {message.startsWith("🎉") && (
-  <button
-    onClick={() => {
-      if (puzzles.length > 1) {
-        let randomIndex = Math.floor(Math.random() * puzzles.length);
-        while (randomIndex === currentPuzzle) {
-          randomIndex = Math.floor(Math.random() * puzzles.length);
-        }
-        setCurrentPuzzle(randomIndex);
-      }
-      setLevel(1);
-      setGuess("");
-      setMessage("");
-    }}
-  >
-    Next Puzzle
-  </button>
-)}
       } else {
         setMessage("❌ Try again!");
       }
     }}
-  >
+    > 
     Guess
   </button>
 
@@ -85,6 +90,12 @@ function Game() {
 </div>
       
       <p>{message}</p>
+
+      {message.startsWith("🎉") && (
+        <button>
+          Next Puzzle
+        </button>
+      )}
     </>
   );
 }
