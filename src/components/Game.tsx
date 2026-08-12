@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PixelatedImage from "./PixelatedImage";
 import { puzzles } from "../data/puzzles";
+import HomeScreen from "./HomeScreen";
 
 function Game() {
   // constants
@@ -11,30 +12,9 @@ function Game() {
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
   const puzzle = puzzles[currentPuzzle];
 
-  if (screen === "home"){
-    // return home screen
-    return (
-      <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Arial, sans-serif",
-        gap: "20px",
-      }}
-    >
-      <h2>Identify the image</h2>
-
-      <button onClick={() => setScreen("playing")}>
-        Start
-      </button>
-      </div>
-
-    )
-  }
-
+  if (screen === "home") {
+  return <HomeScreen onStart={() => setScreen("playing")} />;
+}
 
   return (
     <>
