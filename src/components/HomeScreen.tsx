@@ -1,3 +1,5 @@
+import PixelatedImage from "./PixelatedImage";
+
 type HomeScreenProps = {
   onStart: () => void;
 };
@@ -15,6 +17,13 @@ function HomeScreen({ onStart }: HomeScreenProps) {
         gap: "20px",
       }}
     >
+      <h1>ENHANCE</h1>
+
+      <PixelatedImage
+  image="/images/panda.jpg"
+  level={1}
+/>
+      
       <h2>Identify the image</h2>
 
       <button onClick={onStart}>

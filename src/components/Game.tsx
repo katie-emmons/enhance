@@ -2,6 +2,7 @@ import { useState } from "react";
 import PixelatedImage from "./PixelatedImage";
 import { puzzles } from "../data/puzzles";
 import HomeScreen from "./HomeScreen";
+import PlayingScreen from "./PlayingScreen";
 
 function Game() {
   // constants
@@ -12,72 +13,49 @@ function Game() {
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
   const puzzle = puzzles[currentPuzzle];
 
+  const onNextPuzzle = () => {
+  if (puzzles.length > 1) {
+    let randomIndex = Math.floor(Math.random() * puzzles.length);
+
+    while (randomIndex === currentPuzzle) {
+      randomIndex = Math.floor(Math.random() * puzzles.length);
+    }
+
+    setCurrentPuzzle(randomIndex);
+  }
+
+  setLevel(1);
+  setGuess("");
+  setMessage("");
+};
+
   if (screen === "home") {
-  return <HomeScreen onStart={() => setScreen("playing")} />;
-}
+    return <HomeScreen onStart={() => setScreen("playing")} />;
+  }
 
   return (
-    <>
-      <PixelatedImage
-        image={puzzle.image}
-        level={level}
-      />
-
-      <p>Enhancement Level: {level}</p>
-
-      <input
-  type="text"
-  placeholder="Who or what is this?"
-  value={guess}
-  onChange={(e) => setGuess(e.target.value)}
-  style={{
-    padding: "10px",
-    width: "250px",
-    fontSize: "16px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-  }}
-/>
-<div
-  style={{
-    display: "flex",
-    gap: "10px",
-  }}
->
-  <button
-    onClick={() => {
-      const normalizedGuess = guess.trim().toLowerCase();
-
-      if (normalizedGuess === puzzle.answer) {
-        setMessage("🎉 Correct!");
-      } else {
-        setMessage("❌ Try again!");
-      }
-    }}
-    > 
-    Guess
-  </button>
-
-  <button
-    onClick={() => {
-      if (level < 5) {
-        setLevel(level + 1);
-      }
+  <div
+    style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      fontFamily: "Arial, sans-serif",
+      gap: "20px",
     }}
   >
-    Enhance
-  </button>
-</div>
-      
-      <p>{message}</p>
-
-      {message.startsWith("🎉") && (
-        <button>
-          Next Puzzle
-        </button>
-      )}
-    </>
-  );
-}
+    <PlayingScreen
+      puzzle={puzzle}
+      level={level}
+      setLevel={setLevel}
+      guess={guess}
+      setGuess={setGuess}
+      message={message}
+      setMessage={setMessage}
+      onNextPuzzle={onNextPuzzle}
+    />
+  </div>
+);}
 
 export default Game;
