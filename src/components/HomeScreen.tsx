@@ -20,7 +20,7 @@ function HomeScreen({ onStart }: HomeScreenProps) {
       <h1>ENHANCE</h1>
 
       <PixelatedImage
-  image="/images/panda.jpg"
+  image="/images/elephant.jpg"
   level={1}
 />
       

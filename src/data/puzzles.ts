@@ -1,14 +1,21 @@
+export type Puzzle = {
+  id: number;
+  category: string;
+  image: string;
+  answer: string;
+};
+
 export const puzzles: Puzzle[] = [
   {
     id: 1,
     category: "Animals",
-    image: "/images/panda.jpg",
-    answer: "panda",
+    image: "/images/elephant.jpg",
+    answer: "elephant",
   },
   {
     id: 2,
-    category: "Animals",
-    image: "/images/panda2.jpg",
-    answer: "panda",
+    category: "Landmarks",
+    image: "/images/statue_of_liberty.jpg",
+    answer: "statue of liberty",
   },
 ];

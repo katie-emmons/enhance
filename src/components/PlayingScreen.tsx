@@ -10,18 +10,27 @@ type PlayingScreenProps = {
   message: string;
   setMessage: (message: string) => void;
   onNextPuzzle: () => void;
+  score: number;
+  setScore: (score: number) => void;
+  onCorrectAnswer: () => void;
+  onViewResults: () => void;
 };
 
 function PlayingScreen({
-    puzzle, 
-    level, 
-    setLevel,
-    guess,
-    setGuess,
-    message,
-    setMessage,
-    onNextPuzzle,
+  puzzle,
+  level,
+  setLevel,
+  guess,
+  setGuess,
+  message,
+  setMessage,
+  onNextPuzzle,
+  score,
+  setScore,
+  onCorrectAnswer,
+  onViewResults,
 }: PlayingScreenProps) {
+
   return (
   <>
     <PixelatedImage
@@ -30,6 +39,7 @@ function PlayingScreen({
     />
 
     <p>Enhancement Level: {level}</p>
+    <p>Score: {score}</p>
 
     <input
       type="text"
@@ -52,23 +62,27 @@ function PlayingScreen({
   }}
 >
   <button
-    onClick={() => {
-      const normalizedGuess = guess.trim().toLowerCase();
+  disabled={message.startsWith("🎉")}
+  onClick={() => {
+    const normalizedGuess = guess.trim().toLowerCase();
 
-      if (normalizedGuess === puzzle.answer) {
-        setMessage("🎉 Correct!");
-      } else {
-        setMessage("❌ Try again!");
-      }
-    }}
-  >
-    Guess
-  </button>
+    if (normalizedGuess === puzzle.answer) {
+      setMessage("🎉 Correct!");
+      onCorrectAnswer();
+    } else {
+      setMessage("❌ Try again!");
+    }
+  }}
+>
+  Guess
+</button>
 
   <button
+  disabled={message.startsWith("🎉")}
     onClick={() => {
       if (level < 5) {
         setLevel(level + 1);
+        setScore(score - 200);
       }
     }}
   >
@@ -83,6 +97,11 @@ function PlayingScreen({
     Next Puzzle
   </button>
 )}
+
+<button onClick={onViewResults}>
+  View Results
+</button>
+
   </>
 );
 }
