@@ -1,10 +1,20 @@
 import PixelatedImage from "./PixelatedImage";
 
 type HomeScreenProps = {
-  onStart: () => void;
+  categories: string[];
+  scores: Record<string, number>;
+  onSelectCategory: (category: string) => void;
+  allCategoriesComplete: boolean;
+  onViewResults: () => void;
 };
 
-function HomeScreen({ onStart }: HomeScreenProps) {
+function HomeScreen({
+  categories,
+  scores,
+  allCategoriesComplete,
+  onSelectCategory,
+  onViewResults,
+}: HomeScreenProps) {
   return (
     <div
       style={{
@@ -20,15 +30,42 @@ function HomeScreen({ onStart }: HomeScreenProps) {
       <h1>ENHANCE</h1>
 
       <PixelatedImage
-  image="/images/elephant.jpg"
-  level={1}
-/>
-      
+        image="/images/elephant.jpg"
+        level={1}
+      />
+
       <h2>Identify the image</h2>
 
-      <button onClick={onStart}>
-        Start
-      </button>
+      <h3>Today's Challenge</h3>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+        }}
+      >
+        {categories.map((category) => {
+          const completed = scores[category] !== undefined;
+
+          return (
+            <button
+              key={category}
+              disabled={completed}
+              onClick={() => onSelectCategory(category)}
+            >
+              {completed
+                ? `✓ ${category} — ${scores[category]}`
+                : category}
+            </button>
+          );
+        })}
+      </div>
+      {allCategoriesComplete && (
+  <button onClick={onViewResults}>
+    View Results
+  </button>
+)}
     </div>
   );
 }

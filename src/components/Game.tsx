@@ -14,42 +14,52 @@ function Game() {
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
   const puzzle = puzzles[currentPuzzle];
   const [score, setScore] = useState(1000);
-  const POINTS_PER_ENHANCEMENT = 200;
   const [scores, setScores] = useState<Record<string, number>>({});
   const totalScore = Object.values(scores).reduce((total, score) => total + score, 0);
-  const onViewResults = () => {setScreen("results");
-
-  };
-
-  // next puzzle
+  const onViewResults = () => {
+    setScreen("results");}
+  const categories = [...new Set(puzzles.map((puzzle) => puzzle.category))];
   const onNextPuzzle = () => {
-    if (puzzles.length > 1) {
-      let randomIndex = Math.floor(Math.random() * puzzles.length);
-
-      while (randomIndex === currentPuzzle) {
-        randomIndex = Math.floor(Math.random() * puzzles.length);
-      }
-
-      setCurrentPuzzle(randomIndex);
-    }
-
     setLevel(1);
     setGuess("");
     setMessage("");
     setScore(1000);
-  };
-
+    setScreen("home");};
   const onCorrectAnswer = () => {
-  setScores({
+    setScores({
     ...scores,
     [puzzle.category]: score,
   });
 };
+const onSelectCategory = (category: string) => {
+  const puzzleIndex = puzzles.findIndex(
+    (puzzle) => puzzle.category === category
+  );
+  if (puzzleIndex !== -1) {
+    setCurrentPuzzle(puzzleIndex);
+    setLevel(1);
+    setGuess("");
+    setMessage("");
+    setScore(1000);
+    setScreen("playing");
+  }
+};
+const allCategoriesComplete = categories.every(
+  (category) => scores[category] !== undefined
+);
 
   // transition b/t home screen and playing screen
   if (screen === "home") {
-    return <HomeScreen onStart={() => setScreen("playing")} />;
-  }
+  return (
+    <HomeScreen
+      categories={categories}
+      scores={scores}
+      allCategoriesComplete={allCategoriesComplete}
+      onSelectCategory={onSelectCategory}
+      onViewResults={onViewResults}
+    />
+  );
+}
 
   if (screen === "results") {
   return (

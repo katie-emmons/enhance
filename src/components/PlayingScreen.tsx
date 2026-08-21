@@ -94,7 +94,7 @@ function PlayingScreen({
 
     {message.startsWith("🎉") && (
   <button onClick={onNextPuzzle}>
-    Next Puzzle
+    Back to categories
   </button>
 )}
 
