@@ -34,17 +34,24 @@ function Game() {
   });
 };
 const onSelectCategory = (category: string) => {
-  const puzzleIndex = puzzles.findIndex(
-    (puzzle) => puzzle.category === category
+  const matchingIndexes = puzzles
+    .map((puzzle, index) => (
+      puzzle.category === category ? index : -1
+    ))
+    .filter((index) => index !== -1);
+
+  if (matchingIndexes.length === 0) return;
+
+  const randomIndex = Math.floor(
+    Math.random() * matchingIndexes.length
   );
-  if (puzzleIndex !== -1) {
-    setCurrentPuzzle(puzzleIndex);
-    setLevel(1);
-    setGuess("");
-    setMessage("");
-    setScore(1000);
-    setScreen("playing");
-  }
+
+  setCurrentPuzzle(matchingIndexes[randomIndex]);
+  setLevel(1);
+  setGuess("");
+  setMessage("");
+  setScore(1000);
+  setScreen("playing");
 };
 const allCategoriesComplete = categories.every(
   (category) => scores[category] !== undefined
