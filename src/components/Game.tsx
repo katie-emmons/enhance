@@ -16,9 +16,11 @@ function Game() {
   const [score, setScore] = useState(1000);
   const [scores, setScores] = useState<Record<string, number>>({});
   const totalScore = Object.values(scores).reduce((total, score) => total + score, 0);
+  const correctAnswers = Object.keys(scores).length;
   const onViewResults = () => {
     setScreen("results");}
   const categories = [...new Set(puzzles.map((puzzle) => puzzle.category))];
+  const maxScore = categories.length * 1000;
   const onNextPuzzle = () => {
     setLevel(1);
     setGuess("");
@@ -66,6 +68,9 @@ const allCategoriesComplete = categories.every(
     <ResultsScreen
       scores={scores}
       totalScore={totalScore}
+      maxScore={maxScore}
+      correctAnswers={correctAnswers}
+      totalCategories={categories.length}
     />
   );
 }
