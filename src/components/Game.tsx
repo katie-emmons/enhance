@@ -1,12 +1,14 @@
-import { useState } from "react";
-import PixelatedImage from "./PixelatedImage";
 import { puzzles } from "../data/puzzles";
 import HomeScreen from "./HomeScreen";
 import PlayingScreen from "./PlayingScreen";
 import ResultsScreen from "./ResultsScreen";
+import { getDailyPuzzle } from "../utils/dailyPuzzle";
+import { useState, useEffect } from "react";
+import { loadDailyProgress, saveDailyProgress } from "../utils/dailyProgress";
 
 function Game() {
-  // constants
+  const today = new Date().toISOString().slice(0, 10);
+  // State declarations
   const [level, setLevel] = useState(1);
   const [guess, setGuess] = useState("");
   const [message, setMessage] = useState("");
@@ -14,48 +16,63 @@ function Game() {
   const [currentPuzzle, setCurrentPuzzle] = useState(0);
   const puzzle = puzzles[currentPuzzle];
   const [score, setScore] = useState(1000);
-  const [scores, setScores] = useState<Record<string, number>>({});
+  const [scores, setScores] = useState<Record<string, number>>(() => loadDailyProgress(today));
+
+  // Save progress whenever scores change
+  useEffect(() => {
+    saveDailyProgress(today, scores);
+  }, [today, scores]);
+
+  // Other constants
   const totalScore = Object.values(scores).reduce((total, score) => total + score, 0);
   const correctAnswers = Object.keys(scores).length;
   const onViewResults = () => {
     setScreen("results");}
   const categories = [...new Set(puzzles.map((puzzle) => puzzle.category))];
   const maxScore = categories.length * 1000;
+  const allCategoriesComplete = categories.every(
+  (category) => scores[category] !== undefined);
+  
   const onNextPuzzle = () => {
+    console.log("Categories:", categories);
+    console.log("Scores:", scores);
+    console.log("All categories complete:", allCategoriesComplete);
+  
     setLevel(1);
     setGuess("");
     setMessage("");
     setScore(1000);
-    setScreen("home");};
-  const onCorrectAnswer = () => {
-    setScores({
-    ...scores,
-    [puzzle.category]: score,
-  });
+
+  if (allCategoriesComplete) {
+    setScreen("results");
+  } else {
+    setScreen("home");
+  }
 };
-const onSelectCategory = (category: string) => {
-  const matchingIndexes = puzzles
-    .map((puzzle, index) => (
-      puzzle.category === category ? index : -1
-    ))
-    .filter((index) => index !== -1);
+    const onCorrectAnswer = () => {
+  console.log("Correct answer for:", puzzle.category);
+  console.log("Score earned:", score);
 
-  if (matchingIndexes.length === 0) return;
-
-  const randomIndex = Math.floor(
-    Math.random() * matchingIndexes.length
+  setScores((previousScores) => ({
+    ...previousScores,
+    [puzzle.category]: score,
+  }));
+};
+  const onSelectCategory = (category: string) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const dailyPuzzle = getDailyPuzzle(puzzles, category, today);
+  if (!dailyPuzzle) return;
+  const puzzleIndex = puzzles.findIndex(
+    (puzzle) => puzzle.id === dailyPuzzle.id
   );
-
-  setCurrentPuzzle(matchingIndexes[randomIndex]);
+  if (puzzleIndex === -1) return;
+  setCurrentPuzzle(puzzleIndex);
   setLevel(1);
   setGuess("");
   setMessage("");
   setScore(1000);
   setScreen("playing");
 };
-const allCategoriesComplete = categories.every(
-  (category) => scores[category] !== undefined
-);
 
   // transition b/t home screen and playing screen
   if (screen === "home") {
@@ -106,7 +123,7 @@ const allCategoriesComplete = categories.every(
       score={score}
       setScore={setScore}
       onCorrectAnswer={onCorrectAnswer}
-      onViewResults={onViewResults}
+      allCategoriesComplete={allCategoriesComplete}
 
     />
   </div>

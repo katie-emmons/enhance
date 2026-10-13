@@ -13,7 +13,7 @@ type PlayingScreenProps = {
   score: number;
   setScore: (score: number) => void;
   onCorrectAnswer: () => void;
-  onViewResults: () => void;
+  allCategoriesComplete: boolean;
 };
 
 function PlayingScreen({
@@ -28,7 +28,7 @@ function PlayingScreen({
   score,
   setScore,
   onCorrectAnswer,
-  onViewResults,
+  allCategoriesComplete,
 }: PlayingScreenProps) {
 
   return (
@@ -94,13 +94,9 @@ function PlayingScreen({
 
     {message.startsWith("🎉") && (
   <button onClick={onNextPuzzle}>
-    Back to categories
+    {allCategoriesComplete ? "View Results" : "Back to Categories"}
   </button>
 )}
-
-<button onClick={onViewResults}>
-  View Results
-</button>
 
   </>
 );
