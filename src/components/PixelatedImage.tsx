@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 
 type PixelatedImageProps = {
@@ -5,39 +6,37 @@ type PixelatedImageProps = {
   level: number;
 };
 
+const PIXEL_SIZES = [8, 16, 32, 64];
+
 function PixelatedImage({ image, level }: PixelatedImageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    // Level 5 uses the original image, not the canvas
+    if (level === 5) return;
 
+    const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-
     if (!ctx) return;
 
     const img = new Image();
 
-    img.src = image;
-
     img.onload = () => {
-      const sizeMap = [16, 32, 64, 128, 256];
-      const pixelSize = sizeMap[level - 1];
+      const pixelSize = PIXEL_SIZES[level - 1];
+      if (!pixelSize) return;
 
       canvas.width = 300;
       canvas.height = 300;
 
-      // Turn off smoothing
       ctx.imageSmoothingEnabled = false;
 
-      // Create a tiny temporary canvas
       const tempCanvas = document.createElement("canvas");
       tempCanvas.width = pixelSize;
       tempCanvas.height = pixelSize;
 
       const tempCtx = tempCanvas.getContext("2d");
-
       if (!tempCtx) return;
 
       tempCtx.drawImage(img, 0, 0, pixelSize, pixelSize);
@@ -56,12 +55,42 @@ function PixelatedImage({ image, level }: PixelatedImageProps) {
         300
       );
     };
+
+    img.onerror = () => {
+      console.error("Failed to load image:", image);
+    };
+
+    img.src = image;
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [image, level]);
+
+  if (level === 5) {
+    return (
+      <img
+        src={image}
+        alt="Revealed puzzle"
+        style={{
+          width: 300,
+          height: 300,
+          objectFit: "cover",
+          borderRadius: 12,
+        }}
+      />
+    );
+  }
 
   return (
     <canvas
       ref={canvasRef}
+      width={300}
+      height={300}
       style={{
+        width: 300,
+        height: 300,
         borderRadius: 12,
       }}
     />
