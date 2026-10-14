@@ -1,36 +1,66 @@
 const STORAGE_KEY = "enhance-daily-progress";
 
-type DailyProgress = {
+type Scores = Record<string, number>;
+type ProgressHistory = Record<string, Scores>;
+
+type LegacyProgress = {
   date: string;
-  scores: Record<string, number>;
+  scores: Scores;
 };
 
-export function loadDailyProgress(date: string): Record<string, number> {
+// Read saved history, including the old single-day format
+function readHistory(): ProgressHistory {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-
     if (!saved) return {};
 
-    const progress: DailyProgress = JSON.parse(saved);
+    const data: unknown = JSON.parse(saved);
 
-    if (progress.date !== date) {
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      Array.isArray(data)
+    ) {
       return {};
     }
 
-    return progress.scores;
+    // Convert the old format to the new one
+    if ("date" in data && "scores" in data) {
+      const old = data as LegacyProgress;
+
+      if (
+        typeof old.date === "string" &&
+        old.scores &&
+        typeof old.scores === "object" &&
+        !Array.isArray(old.scores)
+      ) {
+        return { [old.date]: old.scores };
+      }
+
+      return {};
+    }
+
+    return data as ProgressHistory;
   } catch {
     return {};
   }
 }
 
+export function loadDailyProgress(date: string): Scores {
+  const history = readHistory();
+  return history[date] ?? {};
+}
+
 export function saveDailyProgress(
   date: string,
-  scores: Record<string, number>
-) {
-  const progress: DailyProgress = {
-    date,
-    scores,
-  };
+  scores: Scores
+): void {
+  const history = readHistory();
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  history[date] = scores;
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(history)
+  );
 }

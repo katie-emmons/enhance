@@ -9,8 +9,8 @@ import { getLocalDate } from "../utils/date";
 import NewChallengeScreen from "./NewChallengeScreen";
 
 function Game() {
-  const [challengeDate, setChallengeDate] = useState(getLocalDate);
-  const [currentDate, setCurrentDate] = useState(getLocalDate);
+  const [challengeDate, setChallengeDate] = useState("2026-10-13");
+  const [currentDate, setCurrentDate] = useState("2026-10-13");
   // State declarations
   const [level, setLevel] = useState(1);
   const [guess, setGuess] = useState("");
