@@ -14,6 +14,9 @@ type PlayingScreenProps = {
   setScore: (score: number) => void;
   onCorrectAnswer: () => void;
   allCategoriesComplete: boolean;
+  puzzleStatus: "playing" | "solved" | "gaveUp";
+  setPuzzleStatus: (status: "playing" | "solved" | "gaveUp") => void;
+  onGiveUp: () => void;
 };
 
 function PlayingScreen({
@@ -29,6 +32,9 @@ function PlayingScreen({
   setScore,
   onCorrectAnswer,
   allCategoriesComplete,
+  puzzleStatus,
+  setPuzzleStatus,
+  onGiveUp,
 }: PlayingScreenProps) {
 
   return (
@@ -62,12 +68,13 @@ function PlayingScreen({
   }}
 >
   <button
-  disabled={message.startsWith("🎉")}
+  disabled={puzzleStatus !== "playing"}
   onClick={() => {
     const normalizedGuess = guess.trim().toLowerCase();
 
     if (normalizedGuess === puzzle.answer) {
       setMessage("🎉 Correct!");
+      setPuzzleStatus("solved");
       onCorrectAnswer();
     } else {
       setMessage("❌ Try again!");
@@ -76,7 +83,7 @@ function PlayingScreen({
 >
   Guess
 </button>
-
+  {level < 5 && (
   <button
   disabled={message.startsWith("🎉")}
     onClick={() => {
@@ -88,11 +95,17 @@ function PlayingScreen({
   >
     Enhance
   </button>
+  )}
+  {level === 5 && puzzleStatus === "playing" && (
+  <button onClick={onGiveUp}>
+    Give Up
+  </button>
+)}
 </div>
 
     <p>{message}</p>
 
-    {message.startsWith("🎉") && (
+    {puzzleStatus !== "playing" && (
   <button onClick={onNextPuzzle}>
     {allCategoriesComplete ? "View Results" : "Back to Categories"}
   </button>

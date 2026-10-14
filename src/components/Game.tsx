@@ -9,8 +9,8 @@ import { getLocalDate } from "../utils/date";
 import NewChallengeScreen from "./NewChallengeScreen";
 
 function Game() {
-  const [challengeDate, setChallengeDate] = useState("2026-10-13");
-  const [currentDate, setCurrentDate] = useState("2026-10-13");
+  const [challengeDate, setChallengeDate] = useState(getLocalDate);
+  const [currentDate, setCurrentDate] = useState(getLocalDate);
   // State declarations
   const [level, setLevel] = useState(1);
   const [guess, setGuess] = useState("");
@@ -20,6 +20,9 @@ function Game() {
   const puzzle = puzzles[currentPuzzle];
   const [score, setScore] = useState(1000);
   const [scores, setScores] = useState<Record<string, number>>(() => loadDailyProgress(challengeDate));
+  const [puzzleStatus, setPuzzleStatus] = useState<
+  "playing" | "solved" | "gaveUp"
+>("playing");
   useEffect(() => {
   const checkDate = () => {
     setCurrentDate(getLocalDate());
@@ -31,13 +34,12 @@ function Game() {
 }, []);
 
 const newChallengeAvailable = currentDate !== challengeDate;
-console.log("Current date:", currentDate);
-console.log("Challenge date:", challengeDate);
-console.log("New challenge available:", newChallengeAvailable);
 
   // Other constants
   const totalScore = Object.values(scores).reduce((total, score) => total + score, 0);
-  const correctAnswers = Object.keys(scores).length;
+  const correctAnswers = Object.values(scores).filter(
+  (score) => score > 0
+).length;
   const onViewResults = () => {
     setScreen("results");}
   const categories = [...new Set(puzzles.map((puzzle) => puzzle.category))];
@@ -46,14 +48,11 @@ console.log("New challenge available:", newChallengeAvailable);
   (category) => scores[category] !== undefined);
   
   const onNextPuzzle = () => {
-    console.log("Categories:", categories);
-    console.log("Scores:", scores);
-    console.log("All categories complete:", allCategoriesComplete);
-  
     setLevel(1);
     setGuess("");
     setMessage("");
     setScore(1000);
+    setPuzzleStatus("playing");
 
   if (allCategoriesComplete) {
     setScreen("results");
@@ -61,18 +60,26 @@ console.log("New challenge available:", newChallengeAvailable);
     setScreen("home");
   }
 };
-    const onCorrectAnswer = () => {
-  setScores((previousScores) => {
-    const updatedScores = {
-      ...previousScores,
-      [puzzle.category]: score,
-    };
+    
+const recordPuzzleResult = (points: number) => {
+  const updatedScores = {
+    ...scores,
+    [puzzle.category]: points,
+  };
 
-    saveDailyProgress(challengeDate, updatedScores);
-
-    return updatedScores;
-  });
+  setScores(updatedScores);
+  saveDailyProgress(challengeDate, updatedScores);
 };
+const onCorrectAnswer = () => {
+  recordPuzzleResult(score);
+};
+
+const onGiveUp = () => {
+  recordPuzzleResult(0);
+  setPuzzleStatus("gaveUp");
+  setMessage(`The answer was: ${puzzle.answer}`);
+};
+
   const onSelectCategory = (category: string) => {
   const dailyPuzzle = getDailyPuzzle(puzzles, category, challengeDate);
   if (!dailyPuzzle) return;
@@ -86,6 +93,7 @@ console.log("New challenge available:", newChallengeAvailable);
   setMessage("");
   setScore(1000);
   setScreen("playing");
+  setPuzzleStatus("playing");
 };
 
 const onStartNewChallenge = () => {
@@ -100,6 +108,7 @@ const onStartNewChallenge = () => {
   setChallengeDate(newDate);
   setCurrentDate(newDate);
   setScreen("home");
+  setPuzzleStatus("playing");
 };
 
   // transition b/t home screen and playing screen
@@ -160,7 +169,9 @@ const onStartNewChallenge = () => {
       setScore={setScore}
       onCorrectAnswer={onCorrectAnswer}
       allCategoriesComplete={allCategoriesComplete}
-
+      puzzleStatus={puzzleStatus}
+      setPuzzleStatus={setPuzzleStatus}
+      onGiveUp={onGiveUp}
     />
   </div>
 );}

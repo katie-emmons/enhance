@@ -79,14 +79,14 @@ function ResultsScreen({
       justifyContent: "center",
       width: "24px",
       height: "24px",
-      backgroundColor: "#218B57",
+      backgroundColor: score > 0 ? "#218B57" : "#C34242",
       color: "white",
       borderRadius: "5px",
       fontSize: "16px",
       fontWeight: "bold",
     }}
   >
-    ✓
+    {score > 0 ? "✓" : "✕"}
   </span>
 
   <span>{category}</span>
